@@ -19,3 +19,25 @@ class AsyncMockAWSClient:
             {"SubnetId": "subnet-2222", "VpcId": "vpc-0abc123", "CidrBlock": "10.0.2.0/24", "Name": "Private-Subnet-1"}
         ]
 
+
+    async def fetch_security_groups(self):
+        await asyncio.sleep(0.1)
+        return [
+            {
+                "GroupId": "sg-0001",
+                "VpcId": "vpc-0abc123",
+                "GroupName": "web-sg",
+                "IpPermissions": [
+                    {"IpProtocol": "tcp", "FromPort": 80, "ToPort": 80, "IpRanges": [{"CidrIp": "0.0.0.0/0"}]}
+                ]
+            },
+            {
+                "GroupId": "sg-0002",
+                "VpcId": "vpc-0abc123",
+                "GroupName": "db-sg",
+                "IpPermissions": [
+                    {"IpProtocol": "tcp", "FromPort": 5432, "ToPort": 5432, "UserIdGroupPairs": [{"GroupId": "sg-0001"}]}
+                ]
+            }
+        ]
+
