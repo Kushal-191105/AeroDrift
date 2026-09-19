@@ -80,3 +80,4 @@ class AsyncMockAWSClient:
             "ec2_instances": ec2s
         }
 
+# enhanced logging added
