@@ -41,3 +41,25 @@ class AsyncMockAWSClient:
             }
         ]
 
+
+    async def fetch_ec2_instances(self):
+        await asyncio.sleep(0.1)
+        return [
+            {
+                "InstanceId": "i-0123456789abcdef0",
+                "SubnetId": "subnet-1111",
+                "VpcId": "vpc-0abc123",
+                "SecurityGroups": [{"GroupId": "sg-0001"}],
+                "State": {"Name": "running"},
+                "Tags": [{"Key": "Name", "Value": "Web-Server-1"}]
+            },
+            {
+                "InstanceId": "i-0987654321fedcba0",
+                "SubnetId": "subnet-2222",
+                "VpcId": "vpc-0abc123",
+                "SecurityGroups": [{"GroupId": "sg-0002"}],
+                "State": {"Name": "running"},
+                "Tags": [{"Key": "Name", "Value": "Database-Server-1"}]
+            }
+        ]
+
