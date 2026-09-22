@@ -31,3 +31,6 @@ class CloudTopologyGraph:
             for sg_ref in ec2.get("SecurityGroups", []):
                 self.graph.add_edge(sg_ref["GroupId"], ec2["InstanceId"], relation="APPLIES_TO")
 
+
+        self.graph.add_node("0.0.0.0/0", type="Internet", metadata={"Name": "Public Internet"})
+
