@@ -23,3 +23,11 @@ class CloudTopologyGraph:
             self.graph.add_node(sg["GroupId"], type="SecurityGroup", metadata=sg)
             self.graph.add_edge(sg["VpcId"], sg["GroupId"], relation="CONTAINS")
 
+
+        for ec2 in aws_state.get("ec2_instances", []):
+            self.graph.add_node(ec2["InstanceId"], type="EC2", metadata=ec2)
+            self.graph.add_edge(ec2["SubnetId"], ec2["InstanceId"], relation="HOSTS")
+            
+            for sg_ref in ec2.get("SecurityGroups", []):
+                self.graph.add_edge(sg_ref["GroupId"], ec2["InstanceId"], relation="APPLIES_TO")
+
