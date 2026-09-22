@@ -63,3 +63,20 @@ class AsyncMockAWSClient:
             }
         ]
 
+
+    async def get_full_state(self):
+        logger.info("Starting asynchronous AWS state ingestion...")
+        vpcs, subnets, sgs, ec2s = await asyncio.gather(
+            self.fetch_vpcs(),
+            self.fetch_subnets(),
+            self.fetch_security_groups(),
+            self.fetch_ec2_instances()
+        )
+        logger.info("Successfully ingested AWS state.")
+        return {
+            "vpcs": vpcs,
+            "subnets": subnets,
+            "security_groups": sgs,
+            "ec2_instances": ec2s
+        }
+
