@@ -9,3 +9,7 @@ class CloudTopologyGraph:
 
     def build_from_aws_state(self, aws_state: dict):
         logger.info('Building NetworkX graph from ingested AWS data...')
+
+        for vpc in aws_state.get("vpcs", []):
+            self.graph.add_node(vpc["VpcId"], type="VPC", metadata=vpc)
+
