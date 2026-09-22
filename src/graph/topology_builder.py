@@ -13,3 +13,8 @@ class CloudTopologyGraph:
         for vpc in aws_state.get("vpcs", []):
             self.graph.add_node(vpc["VpcId"], type="VPC", metadata=vpc)
 
+
+        for subnet in aws_state.get("subnets", []):
+            self.graph.add_node(subnet["SubnetId"], type="Subnet", metadata=subnet)
+            self.graph.add_edge(subnet["VpcId"], subnet["SubnetId"], relation="CONTAINS")
+
