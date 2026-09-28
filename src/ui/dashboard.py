@@ -25,3 +25,17 @@ class TopologyDashboard:
         self.console.print(tree)
         self.console.print()
 
+
+    def render_drift_alert(self, exposures):
+        if not exposures:
+            self.console.print(Panel("[bold green]✅ No configuration drift detected. Infrastructure is secure.[/bold green]", title="Status", style="green"))
+            return
+        
+        alert_text = "[bold red]CRITICAL: Unapproved public exposure detected![/bold red]\n\n"
+        for exp in exposures:
+            alert_text += f"Target: [bold]{exp['target']}[/bold]\n"
+            alert_text += f"Path: {' ➡️  '.join(exp['path'])}\n"
+            
+        self.console.print(Panel(alert_text, title="⚠️ DRIFT DETECTED ⚠️", border_style="red"))
+        self.console.print()
+
