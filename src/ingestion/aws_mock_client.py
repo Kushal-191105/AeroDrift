@@ -84,3 +84,34 @@ class AsyncMockAWSClient:
                     {"IpProtocol": "tcp", "FromPort": 5432, "ToPort": 5432, "IpRanges": [{"CidrIp": "0.0.0.0/0"}]}
                 )
 
+
+    def revoke_security_group_ingress(self, GroupId: str, IpPermissions: list):
+        """Mock implementation of boto3.revoke_security_group_ingress."""
+        logger.info(f"REVOKING INGRESS: Revoking permissions on {GroupId}...")
+        for sg in self.sgs:
+            if sg["GroupId"] == GroupId:
+                for rule_to_remove in IpPermissions:
+                    protocol = rule_to_remove.get("IpProtocol")
+                    from_port = rule_to_remove.get("FromPort")
+                    to_port = rule_to_remove.get("ToPort")
+                    ranges = [r.get("CidrIp") for r in rule_to_remove.get("IpRanges", [])]
+                    
+                    # Filter out matching permission
+                    updated_perms = []
+                    for existing_rule in sg.get("IpPermissions", []):
+                        if (existing_rule.get("IpProtocol") == protocol and
+                            existing_rule.get("FromPort") == from_port and
+                            existing_rule.get("ToPort") == to_port):
+                            
+                            remaining_ranges = [
+                                r for r in existing_rule.get("IpRanges", [])
+                                if r.get("CidrIp") not in ranges
+                            ]
+                            if remaining_ranges or existing_rule.get("UserIdGroupPairs"):
+                                existing_rule["IpRanges"] = remaining_ranges
+                                updated_perms.append(existing_rule)
+                        else:
+                            updated_perms.append(existing_rule)
+                    sg["IpPermissions"] = updated_perms
+        return {"ResponseMetadata": {"HTTPStatusCode": 200}}
+
