@@ -35,3 +35,27 @@ class ASTCodeGenerator:
         ]
         return ast.Dict(keys=keys, values=values)
 
+
+    def _build_call_node(self, payload: DriftPayload) -> ast.Call:
+        """Constructs ast.Call node for client.revoke_security_group_ingress(...)."""
+        perm_dict = self._build_ip_permission_dict_node(payload)
+        
+        return ast.Call(
+            func=ast.Attribute(
+                value=ast.Name(id="client", ctx=ast.Load()),
+                attr="revoke_security_group_ingress",
+                ctx=ast.Load()
+            ),
+            args=[],
+            keywords=[
+                ast.keyword(
+                    arg="GroupId",
+                    value=ast.Constant(value=payload.group_id)
+                ),
+                ast.keyword(
+                    arg="IpPermissions",
+                    value=ast.List(elts=[perm_dict], ctx=ast.Load())
+                )
+            ]
+        )
+
