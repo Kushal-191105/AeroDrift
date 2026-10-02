@@ -59,3 +59,33 @@ class ASTCodeGenerator:
             ]
         )
 
+
+    def build_function_def(self, payload: DriftPayload) -> ast.FunctionDef:
+        """Wraps the revoke call inside an autonomous remediation function."""
+        call_node = self._build_call_node(payload)
+        
+        # docstring
+        docstring_stmt = ast.Expr(
+            value=ast.Constant(
+                value=f"Autonomous rollback: Revoke {payload.cidr_ip}:{payload.from_port} on {payload.group_id}"
+            )
+        )
+        
+        # return call_stmt
+        return_stmt = ast.Return(value=call_node)
+        
+        func_def = ast.FunctionDef(
+            name="remediate_unauthorized_ingress",
+            args=ast.arguments(
+                posonlyargs=[],
+                args=[ast.arg(arg="client")],
+                kwonlyargs=[],
+                kw_defaults=[],
+                defaults=[]
+            ),
+            body=[docstring_stmt, return_stmt],
+            decorator_list=[]
+        )
+        ast.fix_missing_locations(func_def)
+        return func_def
+
