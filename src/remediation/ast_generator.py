@@ -89,3 +89,13 @@ class ASTCodeGenerator:
         ast.fix_missing_locations(func_def)
         return func_def
 
+
+    def generate_code(self, payload: DriftPayload) -> str:
+        """Synthesizes human-readable Python code using ast.unparse."""
+        func_def = self.build_function_def(payload)
+        module = ast.Module(body=[func_def], type_ignores=[])
+        ast.fix_missing_locations(module)
+        code = ast.unparse(module)
+        logger.info("Successfully synthesized AST remediation code.")
+        return code
+
