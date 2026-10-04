@@ -84,3 +84,11 @@ class ExecutionSandbox:
                 audit_log=audit_log
             )
 
+
+    def get_sandbox_capabilities(self) -> Dict[str, Any]:
+        return {
+            "sandbox_type": "Restricted-AST-Exec",
+            "isolation_level": "Restricted Builtins & Lexical Scope",
+            "allowed_builtins": list(self.allowed_builtins)
+        }
+
