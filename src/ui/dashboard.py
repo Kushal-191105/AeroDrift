@@ -39,3 +39,10 @@ class TopologyDashboard:
         self.console.print(Panel(alert_text, title="⚠️ DRIFT DETECTED ⚠️", border_style="red"))
         self.console.print()
 
+
+    def render_remediation_preview(self, code: str):
+        from rich.syntax import Syntax
+        syntax = Syntax(code, "python", theme="monokai", line_numbers=True)
+        self.console.print(Panel(syntax, title="🤖 Agentic AST Code Generation (Python)", border_style="cyan"))
+        self.console.print()
+
