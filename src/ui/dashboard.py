@@ -46,3 +46,17 @@ class TopologyDashboard:
         self.console.print(Panel(syntax, title="🤖 Agentic AST Code Generation (Python)", border_style="cyan"))
         self.console.print()
 
+
+    def render_remediation_result(self, result):
+        if result.success:
+            content = f"[bold green]✨ Autonomous Remediation Succeeded![/bold green]\n\n"
+            content += f"Action: [cyan]{result.action}[/cyan]\n"
+            content += f"Execution Latency: [yellow]{result.execution_time_ms:.2f} ms[/yellow]\n"
+            content += "\n[bold]Audit Log:[/bold]\n"
+            for log_entry in result.audit_log:
+                content += f" • {log_entry}\n"
+            self.console.print(Panel(content, title="🛡️ Self-Healing Status: SECURE", border_style="green"))
+        else:
+            self.console.print(Panel(f"[bold red]Remediation Failed:[/bold red] {result.error_message}", title="Error", border_style="red"))
+        self.console.print()
+
