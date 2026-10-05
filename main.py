@@ -5,6 +5,7 @@ from src.ingestion.aws_mock_client import AsyncMockAWSClient
 from src.graph.topology_builder import CloudTopologyGraph
 from src.graph.drift_detector import DriftDetector
 from src.ui.dashboard import TopologyDashboard
+from src.remediation.auto_healer import AutoHealer
 
 logging.basicConfig(
     level=logging.INFO,
@@ -12,47 +13,58 @@ logging.basicConfig(
 )
 logger = logging.getLogger("AeroDrift")
 
-async def run_week_2():
-    logger.info("--- AeroDrift: Week 2 Execution ---")
+async def run_week_3():
+    logger.info("=== AeroDrift: Autonomous Cloud Topology & Self-Healing Agent ===")
     
     dashboard = TopologyDashboard()
     client = AsyncMockAWSClient()
     
-    # Phase 1: Baseline
-    logger.info("Phase 1: Establishing Secure Baseline")
+    # 1. Establish Baseline
+    logger.info("Phase 1: Establishing Secure Infrastructure Baseline...")
     aws_state = await client.get_full_state()
-    
     topology = CloudTopologyGraph()
     topology.build_from_aws_state(aws_state)
-    
-    # Render UI
     dashboard.render_tree(aws_state)
     
-    # Check Drift
     detector = DriftDetector(topology)
     exposures = detector.detect_exposure()
     dashboard.render_drift_alert(exposures)
     
-    # Phase 2: Configuration Drift Simulation
-    logger.info("Phase 2: Simulating configuration drift...")
-    time.sleep(2)
+    # 2. Inject Simulated Configuration Drift
+    logger.info("Phase 2: Simulating Unapproved Cloud Configuration Drift...")
+    time.sleep(1.5)
     client.inject_drift()
     
-    # Phase 3: Drift Detection
-    logger.info("Phase 3: Polling drifted state...")
+    # 3. Detect Drift
+    logger.info("Phase 3: Real-Time Drift Detection Query...")
     drifted_state = await client.get_full_state()
-    
     drifted_topology = CloudTopologyGraph()
     drifted_topology.build_from_aws_state(drifted_state)
     
     drifted_detector = DriftDetector(drifted_topology)
     new_exposures = drifted_detector.detect_exposure()
-    
-    # Render final alert
     dashboard.render_drift_alert(new_exposures)
     
-    logger.info("Week 2 implementation successfully executed!")
+    # 4. Agentic Self-Healing via AST & Sandbox
+    if new_exposures:
+        logger.info("Phase 4: Synthesizing AST Remediation Code & Executing in Sandbox...")
+        healer = AutoHealer(client)
+        results = healer.resolve_drift(new_exposures)
+        
+        for res in results:
+            dashboard.render_remediation_preview(res.generated_code)
+            dashboard.render_remediation_result(res)
+            
+        # 5. Post-Remediation Verification
+        logger.info("Phase 5: Post-Remediation Verification & Topology Re-Indexing...")
+        healed_state = await client.get_full_state()
+        healed_topology = CloudTopologyGraph()
+        healed_topology.build_from_aws_state(healed_state)
+        
+        healed_detector = DriftDetector(healed_topology)
+        final_exposures = healed_detector.detect_exposure()
+        dashboard.render_drift_alert(final_exposures)
 
 if __name__ == "__main__":
-    asyncio.run(run_week_2())
+    asyncio.run(run_week_3())
 
