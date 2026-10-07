@@ -19,17 +19,19 @@ class AutoHealer:
             path = exp.get("path", [])
             target = exp.get("target")
             
-            # Locate compromised security group (node following Internet or preceding EC2)
-            compromised_sg = "sg-0002"
-            for node in path:
-                if str(node).startswith("sg-"):
-                    compromised_sg = node
-                    
+            # Locate compromised security group
+            compromised_sg = exp.get("sg")
+            if not compromised_sg:
+                for node in path:
+                    if str(node).startswith("sg-"):
+                        compromised_sg = node
+            
+            port = exp.get("port", 5432)
             payload = DriftPayload(
                 group_id=compromised_sg,
                 protocol="tcp",
-                from_port=5432,
-                to_port=5432,
+                from_port=port,
+                to_port=port,
                 cidr_ip="0.0.0.0/0",
                 target_resource=target
             )

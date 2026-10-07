@@ -18,14 +18,22 @@ class DriftDetector:
 
 
     def detect_exposure(self, source_node="0.0.0.0/0", target_type="Database"):
-        logger.info(f"Scanning for configuration drift: Paths from {source_node} to {target_type}...")
+        logger.info(f"Scanning for configuration drift: Direct exposure paths from {source_node} to {target_type}...")
         targets = self._isolate_target_nodes(target_type)
         exposures = []
         
         for target in targets:
-            if nx.has_path(self.graph, source_node, target):
-                path = nx.shortest_path(self.graph, source_node, target)
-                exposures.append({"target": target, "path": path})
+            for pred in self.graph.predecessors(target):
+                if self.graph.has_edge(source_node, pred):
+                    edge_data = self.graph.get_edge_data(source_node, pred)
+                    port = edge_data.get("port", 5432)
+                    path = [source_node, pred, target]
+                    exposures.append({
+                        "target": target,
+                        "path": path,
+                        "sg": pred,
+                        "port": port
+                    })
                 
         return exposures
 

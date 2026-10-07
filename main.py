@@ -7,6 +7,14 @@ from src.graph.drift_detector import DriftDetector
 from src.ui.dashboard import TopologyDashboard
 from src.remediation.auto_healer import AutoHealer
 
+import sys
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+        sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
