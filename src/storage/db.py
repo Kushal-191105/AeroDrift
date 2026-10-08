@@ -37,3 +37,22 @@ def deserialize_graph(graph_json: str):
     """Deserializes JSON string into node and edge structures."""
     return json.loads(graph_json)
 
+
+def save_snapshot(label: str, graph, is_drifted: bool, metadata: Optional[Dict[str, Any]] = None, db_path: str = DB_PATH) -> int:
+    """Saves a point-in-time cloud topology snapshot into SQLite."""
+    conn = init_db(db_path)
+    now_iso = datetime.now(timezone.utc).isoformat()
+    graph_json = serialize_graph(graph)
+    meta_json = json.dumps(metadata or {})
+    
+    with conn:
+        cursor = conn.execute("""
+            INSERT INTO topology_snapshots (timestamp, label, node_count, edge_count, graph_data, is_drifted, metadata)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (now_iso, label, graph.number_of_nodes(), graph.number_of_edges(), graph_json, 1 if is_drifted else 0, meta_json))
+        snapshot_id = cursor.lastrowid
+        
+    logger.info(f"Saved snapshot #{snapshot_id} ['{label}'] (Nodes: {graph.number_of_nodes()}, Edges: {graph.number_of_edges()})")
+    conn.close()
+    return snapshot_id
+
