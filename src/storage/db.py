@@ -26,3 +26,14 @@ def init_db(db_path: str = DB_PATH) -> sqlite3.Connection:
         """)
     return conn
 
+
+def serialize_graph(graph) -> str:
+    """Serializes NetworkX graph nodes and edges to a JSON string."""
+    nodes = [{"id": n, **data} for n, data in graph.nodes(data=True)]
+    edges = [{"source": u, "target": v, **data} for u, v, data in graph.edges(data=True)]
+    return json.dumps({"nodes": nodes, "edges": edges})
+
+def deserialize_graph(graph_json: str):
+    """Deserializes JSON string into node and edge structures."""
+    return json.loads(graph_json)
+
