@@ -56,3 +56,25 @@ def save_snapshot(label: str, graph, is_drifted: bool, metadata: Optional[Dict[s
     conn.close()
     return snapshot_id
 
+
+def get_snapshots(db_path: str = DB_PATH) -> List[Dict[str, Any]]:
+    """Retrieves all historical topology snapshots."""
+    conn = init_db(db_path)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, timestamp, label, node_count, edge_count, is_drifted, metadata FROM topology_snapshots ORDER BY id ASC")
+    rows = cursor.fetchall()
+    results = [dict(r) for r in rows]
+    conn.close()
+    return results
+
+def get_snapshot_by_id(snapshot_id: int, db_path: str = DB_PATH) -> Optional[Dict[str, Any]]:
+    """Retrieves a full snapshot including serialized graph data."""
+    conn = init_db(db_path)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM topology_snapshots WHERE id = ?", (snapshot_id,))
+    row = cursor.fetchone()
+    conn.close()
+    return dict(row) if row else None
+
