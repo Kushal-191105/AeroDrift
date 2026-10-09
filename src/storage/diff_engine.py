@@ -18,3 +18,16 @@ class TopologyDiffResult:
     removed_edges: List[Dict[str, Any]] = field(default_factory=list)
     total_changes: int = 0
 
+
+class TopologyDiffEngine:
+    """Computes structural differences between two historical graph snapshots."""
+    
+    @staticmethod
+    def _diff_nodes(nodes_a: List[Dict[str, Any]], nodes_b: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+        ids_a = {n["id"]: n for n in nodes_a}
+        ids_b = {n["id"]: n for n in nodes_b}
+        
+        added = [n for nid, n in ids_b.items() if nid not in ids_a]
+        removed = [n for nid, n in ids_a.items() if nid not in ids_b]
+        return added, removed
+
