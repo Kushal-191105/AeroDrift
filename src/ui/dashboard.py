@@ -68,3 +68,28 @@ class TopologyDashboard:
             self.console.print(Panel(f"[bold red]Remediation Failed:[/bold red] {result.error_message}", title="Error", border_style="red"))
         self.console.print()
 
+
+    def render_topology_diff(self, diff_result):
+        from rich.table import Table
+        
+        title = f"🔄 Topology Diff: [{diff_result.snapshot_a_id}] {diff_result.label_a} ➡️  [{diff_result.snapshot_b_id}] {diff_result.label_b}"
+        table = Table(title=title, show_header=True, header_style="bold magenta")
+        table.add_column("Change Type", style="bold", width=14)
+        table.add_column("Resource / Edge", width=40)
+        table.add_column("Details", justify="left")
+        
+        for n in diff_result.added_nodes:
+            table.add_row("[green]+ NODE ADDED[/green]", str(n.get("id")), f"Type: {n.get('type')}")
+        for n in diff_result.removed_nodes:
+            table.add_row("[red]- NODE REMOVED[/red]", str(n.get("id")), f"Type: {n.get('type')}")
+        for e in diff_result.added_edges:
+            table.add_row("[bold yellow]+ EDGE DRIFT[/bold yellow]", f"{e.get('source')} ➡️  {e.get('target')}", f"Rel: {e.get('relation')}, Port: {e.get('port')}")
+        for e in diff_result.removed_edges:
+            table.add_row("[bold cyan]- EDGE REVERTED[/bold cyan]", f"{e.get('source')} ➡️  {e.get('target')}", f"Rel: {e.get('relation')}, Port: {e.get('port')}")
+            
+        if diff_result.total_changes == 0:
+            table.add_row("[dim]NO CHANGES[/dim]", "Identical topologies", "Zero drift detected")
+            
+        self.console.print(table)
+        self.console.print()
+
