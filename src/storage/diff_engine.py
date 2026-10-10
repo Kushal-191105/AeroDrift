@@ -45,3 +45,34 @@ class TopologyDiffEngine:
         removed = [e for k, e in map_a.items() if k not in map_b]
         return added, removed
 
+
+    @classmethod
+    def diff(cls, snapshot_id_a: int, snapshot_id_b: int, db_path: str = "aerodrift_history.db") -> TopologyDiffResult:
+        """Diffs two snapshots by their SQLite database IDs."""
+        snap_a = get_snapshot_by_id(snapshot_id_a, db_path)
+        snap_b = get_snapshot_by_id(snapshot_id_b, db_path)
+        
+        if not snap_a or not snap_b:
+            raise ValueError(f"One or both snapshots ({snapshot_id_a}, {snapshot_id_b}) not found.")
+            
+        data_a = deserialize_graph(snap_a["graph_data"])
+        data_b = deserialize_graph(snap_b["graph_data"])
+        
+        added_nodes, removed_nodes = cls._diff_nodes(data_a.get("nodes", []), data_b.get("nodes", []))
+        added_edges, removed_edges = cls._diff_edges(data_a.get("edges", []), data_b.get("edges", []))
+        
+        total = len(added_nodes) + len(removed_nodes) + len(added_edges) + len(removed_edges)
+        
+        logger.info(f"Diff complete between #{snapshot_id_a} and #{snapshot_id_b}: {total} total changes detected.")
+        return TopologyDiffResult(
+            snapshot_a_id=snapshot_id_a,
+            snapshot_b_id=snapshot_id_b,
+            label_a=snap_a["label"],
+            label_b=snap_b["label"],
+            added_nodes=added_nodes,
+            removed_nodes=removed_nodes,
+            added_edges=added_edges,
+            removed_edges=removed_edges,
+            total_changes=total
+        )
+
