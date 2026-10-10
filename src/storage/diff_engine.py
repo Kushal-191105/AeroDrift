@@ -31,3 +31,17 @@ class TopologyDiffEngine:
         removed = [n for nid, n in ids_a.items() if nid not in ids_b]
         return added, removed
 
+
+    @staticmethod
+    def _edge_key(edge: Dict[str, Any]) -> str:
+        return f"{edge['source']}->{edge['target']}:{edge.get('relation', '')}:{edge.get('port', '')}"
+
+    @classmethod
+    def _diff_edges(cls, edges_a: List[Dict[str, Any]], edges_b: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+        map_a = {cls._edge_key(e): e for e in edges_a}
+        map_b = {cls._edge_key(e): e for e in edges_b}
+        
+        added = [e for k, e in map_b.items() if k not in map_a]
+        removed = [e for k, e in map_a.items() if k not in map_b]
+        return added, removed
+
