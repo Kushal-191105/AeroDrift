@@ -81,3 +81,24 @@ class PDFIncidentReportGenerator:
             Spacer(1, 15)
         ]
 
+
+    def _build_code_section(self, ast_code: str) -> list:
+        styles = getSampleStyleSheet()
+        heading_style = ParagraphStyle("H2", parent=styles["Heading2"], fontSize=14, leading=18, textColor=colors.HexColor("#2D3748"))
+        code_style = ParagraphStyle(
+            "CodeBlock",
+            parent=styles["Code"],
+            fontSize=8,
+            leading=10,
+            textColor=colors.HexColor("#1A202C"),
+            backColor=colors.HexColor("#EDF2F7"),
+            borderPadding=8
+        )
+        
+        return [
+            Paragraph("2. AST-Synthesized Remediation Code", heading_style),
+            Spacer(1, 6),
+            Preformatted(ast_code, code_style),
+            Spacer(1, 15)
+        ]
+
