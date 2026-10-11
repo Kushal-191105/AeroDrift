@@ -44,3 +44,40 @@ class PDFIncidentReportGenerator:
         ]
         return elements
 
+
+    def _build_incident_summary_table(self, target: str, path: list, latency_ms: float) -> list:
+        styles = getSampleStyleSheet()
+        heading_style = ParagraphStyle("H2", parent=styles["Heading2"], fontSize=14, leading=18, textColor=colors.HexColor("#2D3748"))
+        
+        data = [
+            ["Metric / Field", "Incident Details"],
+            ["Security Severity", "CRITICAL (Unauthorized Ingress Route)"],
+            ["Target Cloud Resource", target],
+            ["Compromised Network Vector", " ➡️  ".join(path)],
+            ["Autonomous Action Taken", "AST-Synthesized revoke_security_group_ingress"],
+            ["Self-Healing Latency", f"{latency_ms:.2f} ms"],
+            ["Remediation Status", "RESOLVED & VERIFIED"]
+        ]
+        
+        t = Table(data, colWidths=[180, 320])
+        t.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (1, 0), colors.HexColor("#2B6CB0")),
+            ("TEXTCOLOR", (0, 0), (1, 0), colors.white),
+            ("FONTNAME", (0, 0), (1, 0), "Helvetica-Bold"),
+            ("FONTSIZE", (0, 0), (1, 0), 10),
+            ("BOTTOMPADDING", (0, 0), (1, 0), 6),
+            ("BACKGROUND", (0, 1), (-1, -1), colors.HexColor("#F7FAFC")),
+            ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#CBD5E0")),
+            ("TEXTCOLOR", (0, 1), (0, -1), colors.HexColor("#2D3748")),
+            ("FONTNAME", (0, 1), (0, -1), "Helvetica-Bold"),
+            ("FONTSIZE", (0, 1), (-1, -1), 9),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ]))
+        
+        return [
+            Paragraph("1. Incident Summary & Threat Analysis", heading_style),
+            Spacer(1, 6),
+            t,
+            Spacer(1, 15)
+        ]
+
