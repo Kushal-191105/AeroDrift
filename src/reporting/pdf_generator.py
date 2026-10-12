@@ -122,3 +122,29 @@ class PDFIncidentReportGenerator:
         ]
         return elements
 
+
+    def generate_report(self, incident_id: str, target: str, path: list, latency_ms: float, ast_code: str, audit_log: list) -> str:
+        """Assembles and writes the full PDF report to disk."""
+        now_str = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+        filename = f"Incident_Report_{incident_id}.pdf"
+        filepath = os.path.join(self.output_dir, filename)
+        
+        doc = SimpleDocTemplate(
+            filepath,
+            pagesize=letter,
+            rightMargin=36,
+            leftMargin=36,
+            topMargin=36,
+            bottomMargin=36
+        )
+        
+        story = []
+        story.extend(self._build_header(incident_id, now_str))
+        story.extend(self._build_incident_summary_table(target, path, latency_ms))
+        story.extend(self._build_code_section(ast_code))
+        story.extend(self._build_sandbox_audit_section(audit_log))
+        
+        doc.build(story)
+        logger.info(f"Automated incident PDF report generated at: {filepath}")
+        return filepath
+
