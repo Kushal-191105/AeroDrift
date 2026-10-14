@@ -1,9 +1,63 @@
-# AeroDrift
-AeroDrift is a Python-based CloudOps system that detects cloud security drift and automatically remediates configuration issues in AWS.
-\n## Week 2 Features\n- **Drift Detection**: Automatic graph traversal for unauthorized paths.\n- **UI Dashboard**: Terminal tree rendering using Rich.
+# AeroDrift: Agentic Cloud Topology & Remediation Graph
 
-## Week 3 Features: Agentic Remediation (AST & Sandbox)
-- **Metaprogramming Code Generator**: Uses Python's `ast` module to dynamically build `boto3.revoke_security_group_ingress` rollback functions on the fly.
-- **Controlled Execution Sandbox**: Safely executes dynamic code using `exec()` with restricted lexical scopes and AST security inspection.
-- **Autonomous Self-Healing**: Real-time closed-loop remediation that restores security baselines without human intervention.
+AeroDrift is an autonomous, agentic cloud operations (CloudOps) system built in Python. It continuously maps complex cloud infrastructure into an in-memory mathematical directed graph, detects unauthorized configuration drift (such as exposed databases) in real time, programmatically synthesizes rollback code using Python's `ast` (Abstract Syntax Tree) module, and executes autonomous self-healing in an isolated execution sandbox.
+
+---
+
+## 🏗️ Architecture & Core Components
+
+```mermaid
+flowchart TD
+    AWS["AWS / Mock Cloud APIs"] -->|asyncio non-blocking ingestion| Ingest["Async Cloud Ingestion"]
+    Ingest -->|Parse VPCs, Subnets, EC2s, SGs| Graph["NetworkX Cloud Topology Graph"]
+    Graph -->|Query unauthorized paths| Detector["Drift Detection Engine"]
+    
+    Detector -->|Drift Detected: 0.0.0.0/0 -> SG -> DB| AutoHealer["Autonomous Remediation Agent"]
+    AutoHealer -->|Synthesize AST Node Call| AST["Python AST Metaprogramming"]
+    AST -->|compile and validate code| Sandbox["Restricted Execution Sandbox"]
+    Sandbox -->|Execute revoke_security_group_ingress| AWS
+    
+    Graph -->|Serialize Snapshots| SQLite[("SQLite State Persistence")]
+    SQLite -->|Diff Timestamps| Diff["Topology Diff Engine"]
+    AutoHealer -->|Audit Trail & RCA| PDF["Automated PDF Incident Generator"]
+    
+    Graph -->|Hierarchical Text Tree & Alerts| UI["Rich CLI Terminal Dashboard"]
+    Diff -->|Visual Change Tables| UI
+```
+
+---
+
+## 📅 4-Week Milestone Breakdown
+
+| Week | Target Focus | Key Technologies | Core Deliverables |
+|---|---|---|---|
+| **Week 1** | Cloud Ingestion & Graph Foundations | `asyncio`, `boto3`, `NetworkX` | Concurrent AWS API ingestion, Directed Graph modeling with resource containment & traffic edges. |
+| **Week 2** | Drift Detection & CLI Dashboard | `NetworkX`, `rich.tree`, `rich.panel` | Shortest path security traversal queries (`0.0.0.0/0`), Rich hierarchical topology text-tree UI. |
+| **Week 3** | Agentic Remediation & AST Synthesis | Python `ast`, Restricted `exec()` Sandbox | Dynamic rollback function synthesis, AST security validation, closed-loop self-healing in < 5 ms. |
+| **Week 4** | State Persistence & Automated Reporting | `sqlite3`, `reportlab`, CLI flags | SQLite point-in-time snapshot persistence, graph diffing engine, and automated corporate PDF incident reports. |
+
+---
+
+## 🚀 Quickstart & CLI Commands
+
+### 1. Run Autonomous Self-Healing Pipeline
+```bash
+python main.py
+```
+*Executes the full pipeline: establishes baseline, simulates drift, detects breach, synthesizes AST code, self-heals, validates baseline restoration, records SQLite snapshots, and exports an audit PDF report.*
+
+### 2. View Historical Snapshots
+```bash
+python main.py --history
+```
+
+### 3. Diff Any Two Topology Snapshots
+```bash
+python main.py --diff 1 2
+```
+
+### 4. Run Unit Test Suite
+```bash
+python -m unittest discover tests
+```
 
